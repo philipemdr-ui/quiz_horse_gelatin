@@ -217,7 +217,7 @@ document.querySelectorAll(".opt").forEach(btn => btn.addEventListener("click", (
   document.querySelectorAll(`.opt[data-q="${q}"]`).forEach(b => b.classList.remove("picked"));
   btn.classList.add("picked");
   answers[q] = btn.dataset.v;
-  try { fbq("trackCustom", "QuizAnswer", { question: q, answer: btn.dataset.v }); } catch(e){}
+  try { fbq("trackCustom", "QuizAnswer"); } catch(e){}
   const next = { age: 2, freq: 3, tried: 4 }[q];
   setTimeout(() => go(next), 350);
 }));
@@ -249,11 +249,11 @@ function showResult(){
   document.getElementById("resFreq").innerHTML = TEXT.freq[answers.freq] || "";
   document.getElementById("resTried").innerHTML = TEXT.tried[answers.tried] || "";
   document.getElementById("toVsl").href = buildVslUrl();
-  try { fbq("trackCustom", "QuizComplete", answers); } catch(e){}
+  try { fbq("trackCustom", "QuizComplete"); } catch(e){}
   go(5);
 }
 function decline(){
-  try { fbq("trackCustom", "QuizDecline", answers); } catch(e){}
+  try { fbq("trackCustom", "QuizDecline"); } catch(e){}
   go(6);
 }
 document.getElementById("stepLabel").style.visibility = "hidden";
